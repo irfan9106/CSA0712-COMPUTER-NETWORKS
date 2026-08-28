@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS Name Resolution Simulation — univcampus.edu</title>
+    
+    
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+<style>
+:root{--bg:#07111f;--card:#0d1b2d;--card2:#101f33;--border:#223550;--text:#e6eef8;--muted:#91a4bc;--cyan:#38bdf8;--purple:#a855f7;--green:#34d399;--amber:#fbbf24;--red:#fb7185}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#06101d,#0a1728);color:var(--text);font-family:Inter,Arial,sans-serif;line-height:1.45}
+.app-header{padding:22px 28px;border-bottom:1px solid var(--border);background:#081526}.header-inner{max-width:1500px;margin:auto;display:flex;justify-content:space-between;gap:24px;align-items:flex-start}.brand-section{display:flex;gap:15px}.brand-icon{width:54px;height:54px;border-radius:12px;display:grid;place-items:center;background:#123253;border:1px solid #2b5d8c;color:var(--cyan);font-weight:800}.brand-text h1{font-size:22px;margin:0 0 5px}.brand-text p{margin:0;color:var(--muted)}.header-status-pills{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.status-pill,.card-badge{border:1px solid var(--border);background:#0b192a;padding:7px 10px;border-radius:999px;font-size:12px;color:var(--muted)}.status-indicator-dot{display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:5px}
+.demo-stepper-bar,.global-controls-bar{border-bottom:1px solid var(--border);background:#09182a}.demo-stepper-inner,.global-controls-inner{max-width:1500px;margin:auto;padding:12px 28px;display:flex;gap:14px;align-items:center}.demo-pills-container{display:flex;gap:7px;overflow:auto}.demo-pill-btn,.preset-btn{white-space:nowrap;background:#0e2034;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:7px 10px;cursor:pointer}.demo-pill-btn.active,.demo-pill-btn:hover{color:white;border-color:var(--cyan)}.demo-banner-box{max-width:1500px;margin:18px auto 0;padding:12px 28px;display:flex;justify-content:space-between;gap:15px;align-items:center;background:#0d2034;border:1px solid #244260;border-radius:12px}.demo-badge{font-size:11px;color:var(--cyan);font-weight:800;margin-right:10px}.demo-banner-content{color:var(--muted)}.global-controls-inner{justify-content:space-between}.controls-group{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--border);background:#10243a;color:#dce8f5;padding:9px 12px;border-radius:8px;cursor:pointer;font-weight:600}.btn-primary{background:#075985;border-color:#0ea5e9}.btn-accent{background:#4c1d95;border-color:#8b5cf6}.btn-warning{background:#6b4a08;border-color:#f59e0b}.btn-danger{background:#581c2b;border-color:#fb7185}.btn:disabled{opacity:.45;cursor:not-allowed}.btn:hover{filter:brightness(1.15)}
+.main-layout{max-width:1500px;margin:18px auto;padding:0 28px 30px}.dashboard-grid-2col{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card,.terminal-card{background:linear-gradient(180deg,#0d1b2d,#0a1727);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 12px 30px #0002}.card-header,.terminal-header{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px}.card-header-left{display:flex;align-items:center;gap:9px}.card-header h2{font-size:15px;margin:0}.card-body{padding:16px}.card-icon{font-size:18px}.records-table-wrapper{overflow:auto}.records-table{width:100%;border-collapse:collapse;font-size:12px}.records-table th,.records-table td{padding:9px 8px;border-bottom:1px solid #1c2c42;text-align:left;vertical-align:top}.records-table th{color:var(--muted);font-weight:600}.type-badge{display:inline-block;padding:3px 7px;border-radius:5px;font-size:10px;font-weight:800}.type-badge-a{background:#063b4d;color:#67e8f9}.type-badge-cname{background:#34105a;color:#d8b4fe}.type-badge-mx{background:#513708;color:#fde68a}.min-records-box,.ip-explanation-callout{margin-top:14px;border:1px solid #29425e;background:#09192b;border-radius:10px;padding:12px}.min-records-title{font-weight:700;margin-bottom:7px}.min-records-code,.edu-code-example{font-family:"Fira Code",monospace;color:#b7d6ee;font-size:11px;white-space:pre-line}.min-records-statement{margin-top:9px;color:var(--green);font-size:12px}
+.query-form-container{margin-bottom:16px}.query-input-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.query-input-wrapper{position:relative;flex:1;min-width:220px}.query-input{width:100%;background:#061321;border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:white;outline:none}.query-input:focus{border-color:var(--cyan)}.query-input-icon{position:absolute;left:10px;top:9px}.query-input-wrapper .query-input{padding-left:35px}.preset-pills-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.preset-label{font-size:11px;color:var(--muted);padding:7px}.preset-btn{font-size:11px}.stepper-container{display:grid;gap:8px}.step-card{border:1px solid var(--border);background:#0a1828;border-radius:9px;padding:10px;opacity:.45;transition:.25s}.step-card.active{opacity:1;border-color:#2873a3;box-shadow:0 0 0 1px #2873a355}.step-card-top{display:flex;justify-content:space-between;gap:10px}.step-title-group{display:flex;gap:8px;align-items:center}.step-num-badge{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#172c45;color:var(--cyan);font-size:11px;font-weight:800}.step-name{font-weight:700;font-size:12px}.step-actor-flow{font-size:10px;color:var(--muted)}.step-msg-box{margin-top:7px;background:#061321;border-radius:6px;padding:7px;font:11px "Fira Code",monospace;color:#c7d9eb}.step-detail-text{font-size:10px;color:var(--muted);margin-top:5px}.stepper-nav-bar{display:flex;justify-content:space-between;gap:10px;margin-top:12px;align-items:center}.stepper-progress-text{font-size:11px;color:var(--muted)}.final-result-card{margin-top:12px;padding:13px;border-radius:10px;border:1px solid #168a67;background:#06251f;display:flex;justify-content:space-between;align-items:center}.final-result-domain{font-weight:800}.final-result-value-badge{font:700 20px "Fira Code";color:var(--green)}
+.ip-change-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.ip-flow-box{border:1px solid var(--border);border-radius:10px;padding:12px;background:#081726}.ip-flow-box-title{display:flex;justify-content:space-between;font-size:12px;font-weight:700}.ip-flow-chain{text-align:center;margin-top:10px}.chain-item{padding:7px;background:#102239;border:1px solid #263c57;border-radius:6px;font-size:11px}.chain-arrow{padding:5px;color:var(--muted);font-size:10px}.chain-ip-old{color:#fb7185}.chain-ip-new{color:#34d399}.ip-explanation-callout h4{margin:0 0 5px;font-size:13px}.ip-explanation-callout p{margin:0;color:var(--muted);font-size:11px}
+.diagram-container{overflow:auto}.diagram-svg{width:100%;min-width:550px;height:auto}.svg-link{fill:none;stroke:#29425e;stroke-width:2}.pulse-packet{fill:var(--cyan)}.svg-node-box{fill:#0d1c2e;stroke:#2a435f;stroke-width:1.2;rx:8}.svg-text-title{fill:#dce8f5;font-size:11px;font-weight:700}.svg-text-sub{fill:#8fa5bd;font-size:9px}.svg-text-ip{fill:#67e8f9;font-size:9px;font-family:monospace}
+.terminal-card{background:#050a10}.terminal-header{background:#0a111b}.window-btn{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;background:#475569}.terminal-title{font:11px "Fira Code";color:#cbd5e1}.terminal-quick-buttons{display:flex;gap:6px;flex-wrap:wrap;padding:9px;border-bottom:1px solid #162334}.term-cmd-btn{background:#0b1724;border:1px solid #1d334b;color:#93c5fd;border-radius:5px;padding:5px 7px;font:10px "Fira Code";cursor:pointer}.terminal-body{padding:12px;min-height:190px;font:11px "Fira Code";color:#9fe8c8;overflow:auto}.terminal-output{white-space:pre-wrap;color:#94a3b8}.terminal-prompt-line{display:flex;gap:7px;margin-top:8px}.terminal-prompt{color:#4ade80;white-space:nowrap}.terminal-input{background:transparent;border:0;outline:0;color:#fff;flex:1;font:11px "Fira Code"}.terminal-disclaimer{padding:8px 12px;color:#64748b;font-size:10px;border-top:1px solid #162334}.cache-stats-bar{display:flex;gap:15px;flex-wrap:wrap;margin-bottom:10px;font-size:11px;color:var(--muted)}.edu-cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.edu-card{padding:12px;border:1px solid var(--border);border-radius:9px;background:#091827}.edu-card h4{font-size:12px;margin:0 0 8px}.edu-card p{font-size:11px;color:var(--muted);margin:0 0 10px}.outcomes-list{display:grid;grid-template-columns:1fr 1fr;gap:7px}.outcome-item{font-size:11px;color:var(--muted);padding:8px;background:#091827;border-radius:7px}.outcome-check{color:var(--green);margin-right:6px}.app-footer{text-align:center;padding:20px;color:#71849a;border-top:1px solid var(--border);font-size:12px}
+@media(max-width:1000px){.header-inner,.demo-stepper-inner,.global-controls-inner{flex-direction:column;align-items:stretch}.header-status-pills{justify-content:flex-start}.dashboard-grid-2col{grid-template-columns:1fr}.edu-cards-grid,.ip-change-grid,.outcomes-list{grid-template-columns:1fr}.demo-banner-box{margin-left:16px;margin-right:16px;flex-direction:column;align-items:stretch}.main-layout{padding:0 16px 25px}}
+</style></head>
+<body>
+
+    <!-- Header & Brand Top Bar -->
+    <header class="app-header">
+        <div class="header-inner">
+            <div class="brand-section">
+                <div class="brand-icon">DNS</div>
+                <div class="brand-text">
+                    <h1>Design and Implementation of a DNS Name Resolution Solution for univcampus.edu</h1>
+                    <p>Interactive Educational DNS Simulation for University Networks &amp; Systems</p>
+                </div>
+            </div>
+            <div class="header-status-pills">
+                <div class="status-pill">
+                    <span class="status-indicator-dot"></span>
+                    <span>Zone: <strong>univcampus.edu (Active)</strong></span>
+                </div>
+                <div class="status-pill">
+                    <span>NS: <strong>ns1.univcampus.edu (192.0.2.2)</strong></span>
+                </div>
+                <div class="status-pill">
+                    <span>Resolver: <strong>192.0.2.1</strong></span>
+                </div>
+                <div class="status-pill">
+                    <span>Client: <strong>192.0.2.100</strong></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Guided Demonstration Flow Stepper -->
+    <section class="demo-stepper-bar">
+        <div class="demo-stepper-inner">
+            <div class="demo-stepper-label">
+                <span>🎓 Assignment Presentation Tour:</span>
+            </div>
+            <div class="demo-pills-container" id="demoPillsContainer">
+                <button class="demo-pill-btn active" data-demo="1">Demo 1: Dashboard</button>
+                <button class="demo-pill-btn" data-demo="2">Demo 2: Zone Records</button>
+                <button class="demo-pill-btn" data-demo="3">Demo 3: Query www</button>
+                <button class="demo-pill-btn" data-demo="4">Demo 4: Query web (CNAME)</button>
+                <button class="demo-pill-btn" data-demo="5">Demo 5: Query MX</button>
+                <button class="demo-pill-btn" data-demo="6">Demo 6: Query cse</button>
+                <button class="demo-pill-btn" data-demo="7">Demo 7: Cache Hit</button>
+                <button class="demo-pill-btn" data-demo="8">Demo 8: Change Web IP</button>
+                <button class="demo-pill-btn" data-demo="9">Demo 9: Query web Again</button>
+                <button class="demo-pill-btn" data-demo="10">Demo 10: CNAME Invariance</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Active Demo Banner / Presentation Script Note -->
+    <section class="demo-banner-box" id="demoBannerBox">
+        <div class="demo-banner-content">
+            <span class="demo-badge" id="demoBadge">DEMO 1 / 10</span>
+            <span id="demoTitleText"><strong>Overview:</strong> University DNS Zone Dashboard for univcampus.edu initialized.</span>
+        </div>
+        <div class="demo-banner-actions">
+            <button class="btn btn-secondary btn-sm" id="prevDemoBtn" disabled>&larr; Prev Demo</button>
+            <button class="btn btn-primary btn-sm" id="runDemoActionBtn">▶ Execute Step</button>
+            <button class="btn btn-secondary btn-sm" id="nextDemoBtn">Next Demo &rarr;</button>
+        </div>
+    </section>
+
+    <!-- Global Simulation Controls Bar -->
+    <section class="global-controls-bar">
+        <div class="global-controls-inner">
+            <div class="controls-group">
+                <button class="btn btn-primary" id="btnResolveQueryTop">⚡ Resolve Query</button>
+                <button class="btn btn-secondary" id="btnStepByStepTop">⏯️ Step-by-Step Resolution</button>
+                <button class="btn btn-secondary" id="btnShowZoneRecords">📋 Show DNS Records</button>
+                <button class="btn btn-secondary" id="btnRunNslookupTop">💻 Run nslookup</button>
+                <button class="btn btn-warning" id="btnUpdateIpModalTrigger">⚙️ Update IP</button>
+            </div>
+            <div class="controls-group">
+                <button class="btn btn-danger btn-sm" id="btnClearCacheTop">🧹 Clear Cache</button>
+                <button class="btn btn-secondary btn-sm" id="btnResetSimTop">🔄 Reset Simulation</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Application Grid -->
+    <main class="main-layout">
+        <div class="dashboard-grid-2col">
+            <!-- LEFT COLUMN -->
+            <div class="dashboard-col">
+
+                <!-- A. DNS Zone Records Panel -->
+                <section class="card" id="secZoneRecords">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <span class="card-icon">📋</span>
+                            <h2>DNS Zone Records (univcampus.edu)</h2>
+                        </div>
+                        <span class="card-badge" id="recordsCountBadge">5 Records Configured</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="records-table-wrapper">
+                            <table class="records-table" id="zoneRecordsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Record Type</th>
+                                        <th>Hostname / Name</th>
+                                        <th>Value / Target</th>
+                                        <th>Priority</th>
+                                        <th>TTL</th>
+                                        <th>Purpose / Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recordsTableBody">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Minimum Required DNS Records Reference Box -->
+                        <div class="min-records-box">
+                            <div class="min-records-title">📌 Minimum Required DNS Records (Zone Specification)</div>
+                            <div class="min-records-code">www.univcampus.edu.   IN  A      192.0.2.10
+mail.univcampus.edu.  IN  A      192.0.2.20
+cse.univcampus.edu.   IN  A      192.0.2.30
+web.univcampus.edu.   IN  CNAME  www.univcampus.edu.
+univcampus.edu.       IN  MX     10 mail.univcampus.edu.</div>
+                            <div class="min-records-statement">
+                                <span>✔</span>
+                                <span>These records are sufficient to satisfy all requirements in the given scenario.</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- B. DNS Query Simulator & Animated Step-by-Step Resolution -->
+                <section class="card" id="secQuerySimulator" style="margin-top: 1.5rem;">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <span class="card-icon">🔍</span>
+                            <h2>DNS Query Simulator &amp; Resolution Trace</h2>
+                        </div>
+                        <span class="card-badge" id="queryStatusBadge">Ready for Query</span>
+                    </div>
+                    <div class="card-body">
+                        <!-- Query Input Form -->
+                        <div class="query-form-container">
+                            <div class="query-input-row">
+                                <div class="query-input-wrapper">
+                                    <span class="query-input-icon">🌐</span>
+                                    <input type="text" class="query-input" id="domainQueryInput" value="web.univcampus.edu" placeholder="Enter domain name e.g. web.univcampus.edu">
+                                </div>
+                                <button class="btn btn-primary" id="btnResolveDns">Resolve DNS</button>
+                                <button class="btn btn-accent" id="btnStepByStep">Step-by-Step</button>
+                            </div>
+                            <!-- Preset Quick Buttons -->
+                            <div class="preset-pills-bar">
+                                <span class="preset-label">Quick Presets:</span>
+                                <button class="preset-btn" data-query="www.univcampus.edu">www.univcampus.edu (A)</button>
+                                <button class="preset-btn" data-query="web.univcampus.edu">web.univcampus.edu (CNAME)</button>
+                                <button class="preset-btn" data-query="mail.univcampus.edu">mail.univcampus.edu (A)</button>
+                                <button class="preset-btn" data-query="cse.univcampus.edu">cse.univcampus.edu (A)</button>
+                                <button class="preset-btn" data-query="univcampus.edu" data-type="MX">univcampus.edu (MX)</button>
+                                <button class="preset-btn" data-query="unknown.univcampus.edu" style="border-color: rgba(244,63,94,0.4); color: #fb7185;">unknown.univcampus.edu (NXDOMAIN)</button>
+                            </div>
+                        </div>
+
+                        <!-- Stepper Visual Sequence (6 Steps) -->
+                        <div class="stepper-container" id="stepperContainer">
+                            <!-- Step 1 -->
+                            <div class="step-card" id="stepCard1">
+                                <div class="step-card-top">
+                                    <div class="step-title-group">
+                                        <span class="step-num-badge">1</span>
+                                        <span class="step-name">Step 1 — Client Request</span>
+                                    </div>
+                                    <span class="step-actor-flow">Client &rarr; Local DNS Resolver</span>
+                                </div>
+                                <div class="step-msg-box" id="stepMsg1">Query: web.univcampus.edu</div>
+                                <div class="step-detail-text" id="stepDetail1">Client initiates DNS query to the configured local recursive resolver.</div>
+                            </div>
+
+                            <!-- Step 2 -->
+                            <div class="step-card" id="stepCard2">
+                                <div class="step-card-top">
+                                    <div class="step-title-group">
+                                        <span class="step-num-badge">2</span>
+                                        <span class="step-name">Step 2 — Resolver Checks Cache</span>
+                                    </div>
+                                    <span class="step-actor-flow">Local Resolver &rarr; Checking DNS Cache</span>
+                                </div>
+                                <div class="step-msg-box" id="stepMsg2">Local Resolver &rarr; Checking DNS Cache<br>Cache MISS</div>
+                                <div class="step-detail-text" id="stepDetail2">Resolver checks internal cache. If missing, it queries authoritative nameserver.</div>
+                            </div>
+
+                            <!-- Step 3 -->
+                            <div class="step-card" id="stepCard3">
+                                <div class="step-card-top">
+                                    <div class="step-title-group">
+                                        <span class="step-num-badge">3</span>
+                                        <span class="step-name">Step 3 — Resolver Queries DNS</span>
+                                    </div>
+                                    <span class="step-actor-flow">Local Resolver &rarr; DNS Server</span>
+                                </div>
+                                <div class="step-msg-box" id="stepMsg3">Local Resolver &rarr; DNS Server<br>Query: web.univcampus.edu</div>
+                                <div class="step-detail-text" id="stepDetail3">Resolver contacts authoritative nameserver for zone univcampus.edu.</div>
+                            </div>
+
+                            <!-- Step 4 -->
+                            <div class="step-card" id="stepCard4">
+                                <div class="step-card-top">
+                                    <div class="step-title-group">
+                                        <span class="step-num-badge">4</span>
+                                        <span class="step-name">Step 4 — DNS Server Finds CNAME</span>
+                                    </div>
+                                    <span class="step-actor-flow">DNS Server &rarr; Zone Table</span>
+                                </div>
+                                <div class="step-msg-box" id="stepMsg4">web.univcampus.edu<br>CNAME: www.univcampus.edu</div>
+                                <div class="step-detail-text" id="stepDetail4">web.univcampus.edu is an alias for www.univcampus.edu.</div>
+                            </div>
+
+                            <!-- Step 5 -->
+                            <div class="step-card" id="stepCard5">
+                                <div class="step-card-top">
+                                    <div class="step-title-group">
+                                        <span class="step-num-badge">5</span>
+                                        <span class="step-name">Step 5 — Resolve the Target</span>
+                                    </div>
+                                    <span class="step-actor-flow">Resolver &rarr; Target A Record</span>
+                                </div>
+                                <div class="step-msg-box" id="stepMsg5">The resolver then looks up:<br>www.univcampus.edu<br>Find: A = 192.0.2.10</div>
+                                <div class="step-detail-text" id="stepDetail5">Resolver queries and resolves canonical target hostname to IP.</div>
+                            </div>
+
+                            <!-- Step 6 -->
+                            <div class="step-card" id="stepCard6">
+                                <div class="step-card-top">
+                                    <div class="step-title-group">
+                                        <span class="step-num-badge">6</span>
+                                        <span class="step-name">Step 6 — Return Result</span>
+                                    </div>
+                                    <span class="step-actor-flow">DNS Server &rarr; Local Resolver &rarr; Client</span>
+                                </div>
+                                <div class="step-msg-box" id="stepMsg6">Final result:<br>web.univcampus.edu &rarr; www.univcampus.edu &rarr; 192.0.2.10</div>
+                                <div class="step-detail-text" id="stepDetail6">Client receives response and local resolver caches records for 3600 seconds.</div>
+                            </div>
+                        </div>
+
+                        <!-- Step Navigation Controls -->
+                        <div class="stepper-nav-bar" id="stepperNavBar">
+                            <div class="controls-group">
+                                <button class="btn btn-secondary btn-sm" id="btnPrevStep" disabled>&larr; Prev Step</button>
+                                <button class="btn btn-primary btn-sm" id="btnNextStep">Next Step &rarr;</button>
+                                <button class="btn btn-accent btn-sm" id="btnAutoPlay">▶ Auto Play</button>
+                            </div>
+                            <div class="controls-group">
+                                <span class="stepper-progress-text" id="stepProgressText">Step 0 of 6</span>
+                                <select class="btn btn-secondary btn-sm" id="speedSelector" style="padding: 0.25rem 0.5rem;">
+                                    <option value="1200">Speed: 1x</option>
+                                    <option value="700">Speed: 1.5x</option>
+                                    <option value="400">Speed: 2x</option>
+                                    <option value="2200">Speed: 0.5x (Slow)</option>
+                                </select>
+                                <button class="btn btn-secondary btn-sm" id="btnResetSteps">↺ Reset</button>
+                            </div>
+                        </div>
+
+                        <!-- Prominent Final IP Result Display -->
+                        <div class="final-result-card" id="finalResultCard" style="display: none;">
+                            <div class="final-result-left">
+                                <h4 id="finalResultHeaderTitle">FINAL RESOLVED IP ADDRESS</h4>
+                                <div class="final-result-domain" id="finalResultDomainName">web.univcampus.edu</div>
+                                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;" id="finalResultChainText">web.univcampus.edu &rarr; www.univcampus.edu &rarr; 192.0.2.10</div>
+                            </div>
+                            <div class="final-result-right">
+                                <div class="final-result-value-badge" id="finalResultIpBadge">192.0.2.10</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- C. Web Server IP Address Change Simulation -->
+                <section class="card" id="secIpChange" style="margin-top: 1.5rem;">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <span class="card-icon">⚙️</span>
+                            <h2>Web Server IP Change Simulation</h2>
+                        </div>
+                        <span class="card-badge" id="webIpBadgeCurrent">Current: 192.0.2.10</span>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                            Simulate changing the physical web server host IP from <code>192.0.2.10</code> to <code>192.0.2.50</code> and observe how DNS record abstraction isolates aliases from infrastructure changes.
+                        </p>
+
+                        <!-- Form -->
+                        <div class="query-input-row">
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                                Current IP: <strong style="color: #f8fafc; font-family: monospace;">192.0.2.10</strong>
+                            </div>
+                            <div class="query-input-wrapper" style="max-width: 220px;">
+                                <input type="text" class="query-input" id="newWebServerIpInput" value="192.0.2.50" placeholder="e.g. 192.0.2.50" style="padding-left: 0.75rem;">
+                            </div>
+                            <button class="btn btn-warning" id="btnUpdateWebServerIp">Update Web Server IP</button>
+                            <button class="btn btn-secondary btn-sm" id="btnSet50Preset">Set 192.0.2.50</button>
+                        </div>
+
+                        <!-- Side-by-Side Flow Visualizer: Before vs After -->
+                        <div class="ip-change-grid">
+                            <div class="ip-flow-box">
+                                <div class="ip-flow-box-title">
+                                    <span>Before IP Update</span>
+                                    <span class="type-badge type-badge-a">Original</span>
+                                </div>
+                                <div class="ip-flow-chain">
+                                    <div class="chain-item">web.univcampus.edu</div>
+                                    <div class="chain-arrow">&darr; CNAME</div>
+                                    <div class="chain-item">www.univcampus.edu</div>
+                                    <div class="chain-arrow">&darr; A Record</div>
+                                    <div class="chain-item chain-ip-old" id="boxIpBefore">192.0.2.10</div>
+                                </div>
+                            </div>
+                            <div class="ip-flow-box" style="border-color: rgba(56,189,248,0.4);">
+                                <div class="ip-flow-box-title">
+                                    <span style="color: var(--accent-cyan);">After IP Update</span>
+                                    <span class="type-badge type-badge-a" id="badgeAfterStatus">Updated</span>
+                                </div>
+                                <div class="ip-flow-chain">
+                                    <div class="chain-item">web.univcampus.edu</div>
+                                    <div class="chain-arrow">&darr; CNAME (Unchanged)</div>
+                                    <div class="chain-item">www.univcampus.edu</div>
+                                    <div class="chain-arrow">&darr; A Record (Updated)</div>
+                                    <div class="chain-item chain-ip-new" id="boxIpAfter">192.0.2.50</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Prominent Explanation Callout Box -->
+                        <div class="ip-explanation-callout">
+                            <h4>💡 Key Architectural Takeaway</h4>
+                            <p id="ipChangeExplanationText">
+                                <strong>Only the A record for www.univcampus.edu needs to be updated.</strong> The CNAME remains unchanged because it points to the hostname <code>www.univcampus.edu</code>, not directly to an IP address.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="dashboard-col">
+
+                <!-- D. Interactive DNS Architecture Network Diagram -->
+                <section class="card" id="secArchitectureDiagram">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <span class="card-icon">🌐</span>
+                            <h2>DNS Architecture &amp; Resolution Path</h2>
+                        </div>
+                        <span class="card-badge">Interactive SVG Topology</span>
+                    </div>
+                    <div class="card-body" style="padding: 0.75rem;">
+                        <div class="diagram-container">
+                            <svg class="diagram-svg" id="dnsNetworkSvg" viewBox="0 0 620 480" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feGaussianBlur stdDeviation="4" result="blur" />
+                                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                    </filter>
+                                    <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#1e293b" />
+                                        <stop offset="100%" stop-color="#0f172a" />
+                                    </linearGradient>
+                                    <linearGradient id="serverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#1e3a5f" />
+                                        <stop offset="100%" stop-color="#0f2038" />
+                                    </linearGradient>
+                                    <linearGradient id="resolverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#2e1f4d" />
+                                        <stop offset="100%" stop-color="#18102a" />
+                                    </linearGradient>
+                                </defs>
+
+                                <!-- Static Network Connection Lines -->
+                                <g id="svgLinksGroup">
+                                    <!-- Client to Resolver -->
+                                    <path id="path-client-resolver" class="svg-link" d="M 100 80 L 100 200" />
+                                    <!-- Resolver to Cache -->
+                                    <path id="path-resolver-cache" class="svg-link" d="M 160 230 L 230 230" />
+                                    <!-- Resolver to DNS Server -->
+                                    <path id="path-resolver-server" class="svg-link" d="M 100 260 L 100 370 L 320 370" />
+                                    <!-- Server to www -->
+                                    <path id="path-server-www" class="svg-link" d="M 420 340 L 520 230" />
+                                    <!-- Server to mail -->
+                                    <path id="path-server-mail" class="svg-link" d="M 420 370 L 520 340" />
+                                    <!-- Server to cse -->
+                                    <path id="path-server-cse" class="svg-link" d="M 420 400 L 520 440" />
+                                    <!-- web CNAME to www -->
+                                    <path id="path-web-cname" class="svg-link cname-link" d="M 520 120 L 520 190" />
+                                    <!-- Server to web alias -->
+                                    <path id="path-server-web" class="svg-link" d="M 380 340 L 380 120 L 460 120" />
+                                    <!-- Server to MX -->
+                                    <path id="path-server-mx" class="svg-link" d="M 420 370 L 470 370 L 470 340 L 520 340" />
+                                    <!-- Return path to client -->
+                                    <path id="path-resolver-client" class="svg-link" d="M 100 200 L 100 80" />
+                                </g>
+
+                                <!-- Animated Pulse Circle -->
+                                <circle id="packetPulse" class="pulse-packet" cx="100" cy="80" r="7" style="opacity: 0;"></circle>
+
+                                <!-- NODES -->
+                                <!-- Node: Client Workstation -->
+                                <g id="node-client" class="svg-node" transform="translate(30, 30)">
+                                    <rect class="svg-node-box" width="140" height="55" />
+                                    <text class="svg-text-title" x="70" y="24" text-anchor="middle">💻 Client Workstation</text>
+                                    <text class="svg-text-sub" x="70" y="42" text-anchor="middle">192.0.2.100</text>
+                                </g>
+
+                                <!-- Node: Local DNS Resolver -->
+                                <g id="node-resolver" class="svg-node" transform="translate(25, 195)">
+                                    <rect class="svg-node-box" width="150" height="65" fill="url(#resolverGrad)" />
+                                    <text class="svg-text-title" x="75" y="24" text-anchor="middle">🔄 Local Resolver</text>
+                                    <text class="svg-text-sub" x="75" y="42" text-anchor="middle">IP: 192.0.2.1</text>
+                                    <text class="svg-text-sub" x="75" y="56" text-anchor="middle" fill="#a855f7">Port 53 (UDP)</text>
+                                </g>
+
+                                <!-- Node: DNS Cache -->
+                                <g id="node-cache" class="svg-node" transform="translate(225, 205)">
+                                    <rect class="svg-node-box" width="105" height="50" />
+                                    <text class="svg-text-title" x="52" y="22" text-anchor="middle">⚡ DNS Cache</text>
+                                    <text class="svg-text-sub" x="52" y="38" text-anchor="middle" id="svgCacheCountText">0 Entries</text>
+                                </g>
+
+                                <!-- Node: Authoritative DNS Server -->
+                                <g id="node-server" class="svg-node" transform="translate(270, 335)">
+                                    <rect class="svg-node-box" width="160" height="70" fill="url(#serverGrad)" />
+                                    <text class="svg-text-title" x="80" y="24" text-anchor="middle">🏛️ DNS Server (NS1)</text>
+                                    <text class="svg-text-sub" x="80" y="42" text-anchor="middle">ns1.univcampus.edu</text>
+                                    <text class="svg-text-ip" x="80" y="58" text-anchor="middle">Zone: univcampus.edu</text>
+                                </g>
+
+                                <!-- Host Node: web.univcampus.edu (CNAME) -->
+                                <g id="node-record-web" class="svg-node" transform="translate(460, 90)">
+                                    <rect class="svg-node-box" width="145" height="55" />
+                                    <text class="svg-text-title" x="72" y="22" text-anchor="middle">web.univcampus.edu</text>
+                                    <text class="svg-text-sub" x="72" y="38" text-anchor="middle" fill="#c084fc">CNAME &rarr; www</text>
+                                    <text class="svg-text-sub" x="72" y="50" text-anchor="middle">Alias for web server</text>
+                                </g>
+
+                                <!-- Host Node: www.univcampus.edu (A) -->
+                                <g id="node-record-www" class="svg-node" transform="translate(460, 195)">
+                                    <rect class="svg-node-box" width="145" height="55" />
+                                    <text class="svg-text-title" x="72" y="22" text-anchor="middle">www.univcampus.edu</text>
+                                    <text class="svg-text-sub" x="72" y="38" text-anchor="middle">A Record (Web)</text>
+                                    <text class="svg-text-ip" x="72" y="50" text-anchor="middle" id="svgWwwIpText">192.0.2.10</text>
+                                </g>
+
+                                <!-- Host Node: mail.univcampus.edu (A / MX Target) -->
+                                <g id="node-record-mail" class="svg-node" transform="translate(460, 305)">
+                                    <rect class="svg-node-box" width="145" height="60" />
+                                    <text class="svg-text-title" x="72" y="20" text-anchor="middle">mail.univcampus.edu</text>
+                                    <text class="svg-text-sub" x="72" y="36" text-anchor="middle">A Record &amp; MX Target</text>
+                                    <text class="svg-text-ip" x="72" y="52" text-anchor="middle">192.0.2.20</text>
+                                </g>
+
+                                <!-- Host Node: cse.univcampus.edu (A) -->
+                                <g id="node-record-cse" class="svg-node" transform="translate(460, 405)">
+                                    <rect class="svg-node-box" width="145" height="55" />
+                                    <text class="svg-text-title" x="72" y="22" text-anchor="middle">cse.univcampus.edu</text>
+                                    <text class="svg-text-sub" x="72" y="38" text-anchor="middle">A Record (CSE Dept)</text>
+                                    <text class="svg-text-ip" x="72" y="50" text-anchor="middle">192.0.2.30</text>
+                                </g>
+
+                                <!-- Label for MX -->
+                                <g id="node-record-mx" transform="translate(390, 290)">
+                                    <rect width="80" height="24" rx="4" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="1" />
+                                    <text x="40" y="16" fill="#fbbf24" font-size="10" font-weight="bold" text-anchor="middle" font-family="sans-serif">MX (Pref: 10)</text>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- E. DNS Command Simulator (Terminal Window) -->
+                <section class="terminal-card" id="secTerminalSimulator" style="margin-top: 1.5rem;">
+                    <div class="terminal-header">
+                        <div class="terminal-window-buttons">
+                            <span class="window-btn btn-close"></span>
+                            <span class="window-btn btn-min"></span>
+                            <span class="window-btn btn-max"></span>
+                        </div>
+                        <div class="terminal-title">DNS Command Simulator — student@campus-workstation: ~</div>
+                        <div style="font-size: 0.72rem; color: #4ade80;">● ONLINE</div>
+                    </div>
+                    <!-- Terminal Quick Command Action Chips -->
+                    <div class="terminal-quick-buttons">
+                        <span class="terminal-btn-label">Run Command:</span>
+                        <button class="term-cmd-btn" data-cmd="nslookup www.univcampus.edu">nslookup www.univcampus.edu</button>
+                        <button class="term-cmd-btn" data-cmd="nslookup web.univcampus.edu">nslookup web.univcampus.edu</button>
+                        <button class="term-cmd-btn" data-cmd="nslookup mail.univcampus.edu">nslookup mail.univcampus.edu</button>
+                        <button class="term-cmd-btn" data-cmd="nslookup cse.univcampus.edu">nslookup cse.univcampus.edu</button>
+                        <button class="term-cmd-btn" data-cmd="nslookup -type=MX univcampus.edu">nslookup -type=MX univcampus.edu</button>
+                        <button class="term-cmd-btn" data-cmd="nslookup unknown.univcampus.edu" style="color: #fb7185;">nslookup unknown.univcampus.edu</button>
+                    </div>
+                    <!-- Terminal Screen Output -->
+                    <div class="terminal-body" id="terminalOutputArea">
+                        <div class="terminal-output">DNS Name Resolution Diagnostic Shell (univcampus.edu)
+Type 'help' for available commands, or click the quick command buttons above.
+--------------------------------------------------------------------------------</div>
+                        <div class="terminal-prompt-line">
+                            <span class="terminal-prompt">student@campus-workstation:~$</span>
+                            <input type="text" class="terminal-input" id="termCliInput" placeholder="Type nslookup command and press Enter...">
+                        </div>
+                    </div>
+                    <!-- Terminal Simulation Disclaimer -->
+                    <div class="terminal-disclaimer">
+                        <span>⚠️</span>
+                        <span>Simulated Command Shell — commands query the internal campus DNS simulation engine (not live internet).</span>
+                    </div>
+                </section>
+
+                <!-- F. DNS Resolver Cache Simulation -->
+                <section class="card" id="secCacheSim" style="margin-top: 1.5rem;">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <span class="card-icon">💾</span>
+                            <h2>Local Resolver DNS Cache</h2>
+                        </div>
+                        <button class="btn btn-danger btn-sm" id="btnClearCacheBtn">Clear Cache</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="cache-stats-bar">
+                            <div class="cache-stat-item">Total Queries: <strong id="statTotalQueries">0</strong></div>
+                            <div class="cache-stat-item">Cache Hits: <strong id="statCacheHits" style="color: #34d399;">0</strong></div>
+                            <div class="cache-stat-item">Cache Misses: <strong id="statCacheMisses" style="color: #fbbf24;">0</strong></div>
+                            <div class="cache-stat-item">Hit Ratio: <strong id="statHitRatio">0%</strong></div>
+                        </div>
+
+                        <div class="records-table-wrapper">
+                            <table class="records-table" id="cacheTable">
+                                <thead>
+                                    <tr>
+                                        <th>Domain</th>
+                                        <th>Type</th>
+                                        <th>Target / IP</th>
+                                        <th>TTL (s)</th>
+                                        <th>Hits</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cacheTableBody">
+                                    <tr>
+                                        <td colspan="5" class="cache-empty-state">
+                                            Cache is currently empty. Run a DNS query to populate the resolver cache.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <!-- BOTTOM PANELS -->
+        <!-- G. Educational Explanations: Record Types -->
+        <section class="card" style="margin-top: 1.5rem;">
+            <div class="card-header">
+                <div class="card-header-left">
+                    <span class="card-icon">📖</span>
+                    <h2>DNS Record Types Reference Guide</h2>
+                </div>
+                <span class="card-badge">RFC 1035 Standards</span>
+            </div>
+            <div class="card-body">
+                <div class="edu-cards-grid">
+                    <!-- A Record -->
+                    <div class="edu-card">
+                        <h4><span class="type-badge type-badge-a">A Record</span> Address Record</h4>
+                        <p>Maps a hostname directly to a 32-bit IPv4 address. Enables clients to contact destination servers by human-readable names.</p>
+                        <div class="edu-code-example">www.univcampus.edu &rarr; 192.0.2.10</div>
+                    </div>
+                    <!-- CNAME Record -->
+                    <div class="edu-card">
+                        <h4><span class="type-badge type-badge-cname">CNAME</span> Canonical Name</h4>
+                        <p>Creates an alias pointing to another canonical hostname. Decouples service names from direct IP configurations and streamlines IP migrations.</p>
+                        <div class="edu-code-example">web.univcampus.edu &rarr; www.univcampus.edu</div>
+                    </div>
+                    <!-- MX Record -->
+                    <div class="edu-card">
+                        <h4><span class="type-badge type-badge-mx">MX Record</span> Mail Exchanger</h4>
+                        <p>Specifies the Mail Transfer Agent (MTA) server responsible for accepting incoming email for the domain, with numerical priority preference.</p>
+                        <div class="edu-code-example">univcampus.edu &rarr; mail.univcampus.edu (Priority: 10)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- H. Learning Outcomes -->
+        <section class="card" style="margin-top: 1.5rem;">
+            <div class="card-header">
+                <div class="card-header-left">
+                    <span class="card-icon">🎯</span>
+                    <h2>Learning Outcomes</h2>
+                </div>
+                <span class="card-badge">Applied Computer Networks Assessment</span>
+            </div>
+            <div class="card-body">
+                <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                    After completing this simulation, the student should understand:
+                </p>
+                <div class="outcomes-list">
+                    <div class="outcome-item">
+                        <span class="outcome-check">✔</span>
+                        <span>How DNS maps human-friendly domain names to machine-routable IP addresses.</span>
+                    </div>
+                    <div class="outcome-item">
+                        <span class="outcome-check">✔</span>
+                        <span>The purpose and structure of <strong>A records</strong> for IPv4 host binding.</span>
+                    </div>
+                    <div class="outcome-item">
+                        <span class="outcome-check">✔</span>
+                        <span>The purpose and resolution mechanics of <strong>CNAME records</strong> as canonical aliases.</span>
+                    </div>
+                    <div class="outcome-item">
+                        <span class="outcome-check">✔</span>
+                        <span>The purpose of <strong>MX records</strong> and priority rankings in email routing.</span>
+                    </div>
+                    <div class="outcome-item">
+                        <span class="outcome-check">✔</span>
+                        <span>The recursive and iterative DNS resolution process step-by-step.</span>
+                    </div>
+                    <div class="outcome-item">
+                        <span class="outcome-check">✔</span>
+                        <span>How <strong>DNS caching</strong> prevents redundant network round-trips and reduces server load.</span>
+                    </div>
+                    <div class="outcome-item">
+                        <span class="outcome-check">✔</span>
+                        <span>What happens when a physical server IP address changes.</span>
+                    </div>
+                    <div class="outcome-item">
+                        <span class="outcome-check">✔</span>
+                        <span><strong>Why a CNAME record does not need to change</strong> when the target server's IP changes.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <p class="footer-text">
+            <strong>DNS Name Resolution Simulation</strong> | Applied Computer Networks
+        </p>
+    </footer>
+
+    <!-- Scripts -->
+
+<script>
+const records = {
+ "www.univcampus.edu": {type:"A", value:"192.0.2.10"},
+ "mail.univcampus.edu": {type:"A", value:"192.0.2.20"},
+ "cse.univcampus.edu": {type:"A", value:"192.0.2.30"},
+ "web.univcampus.edu": {type:"CNAME", value:"www.univcampus.edu"},
+ "univcampus.edu": {type:"MX", value:"mail.univcampus.edu", priority:10}
+};
+let webIP="192.0.2.10", cache={}, total=0,hits=0,misses=0,step=0;
+
+function renderRecords(){
+ const b=document.getElementById("recordsTableBody"); b.innerHTML="";
+ Object.entries(records).forEach(([name,r])=>{
+  const tr=document.createElement("tr");
+  tr.innerHTML=`<td><span class="type-badge ${r.type==="A"?"type-badge-a":r.type==="CNAME"?"type-badge-cname":"type-badge-mx"}">${r.type}</span></td><td>${name}</td><td>${r.value}</td><td>${r.priority??"—"}</td><td>3600</td><td>${r.type==="A"?"Host address":r.type==="CNAME"?"Alias / canonical hostname":"Mail exchanger"}</td>`;
+  b.appendChild(tr);
+ });
+}
+function resolve(q){
+ total++;
+ if(cache[q]){hits++; updateCache(); return cache[q]}
+ misses++;
+ let r=records[q];
+ if(!r){updateCache(); return {error:"NXDOMAIN"}}
+ if(r.type==="CNAME") r={type:"A",value:records[r.value].value,chain:q+" → "+records[q].value+" → "+records[r.value].value};
+ else if(r.type==="MX") r={type:"MX",value:r.value,priority:r.priority,chain:q+" → MX 10 → "+r.value};
+ else r={...r,chain:q+" → "+r.value};
+ cache[q]=r; updateCache(); return r;
+}
+function updateCache(){
+ document.getElementById("statTotalQueries").textContent=total;
+ document.getElementById("statCacheHits").textContent=hits;
+ document.getElementById("statCacheMisses").textContent=misses;
+ document.getElementById("statHitRatio").textContent=total?Math.round(hits/total*100)+"%":"0%";
+ const b=document.getElementById("cacheTableBody"); b.innerHTML="";
+ if(!Object.keys(cache).length){b.innerHTML='<tr><td colspan="5" class="cache-empty-state">Cache is currently empty. Run a DNS query to populate the resolver cache.</td></tr>';return}
+ Object.entries(cache).forEach(([d,r])=>b.innerHTML+=`<tr><td>${d}</td><td>${r.type}</td><td>${r.value}</td><td>3600</td><td>—</td></tr>`);
+ document.getElementById("svgCacheCountText").textContent=Object.keys(cache).length+" Entries";
+}
+function showResult(q,r){
+ const card=document.getElementById("finalResultCard");
+ if(!r || r.error){card.style.display="flex";document.getElementById("finalResultDomainName").textContent=q;document.getElementById("finalResultIpBadge").textContent="NXDOMAIN";document.getElementById("finalResultChainText").textContent="Requested hostname does not exist.";return}
+ card.style.display="flex";
+ document.getElementById("finalResultDomainName").textContent=q;
+ document.getElementById("finalResultChainText").textContent=r.chain||q+" → "+r.value;
+ document.getElementById("finalResultIpBadge").textContent=r.type==="MX"?r.value:r.value;
+}
+function doQuery(q){
+ q=q.trim().toLowerCase(); if(!q)return;
+ document.getElementById("domainQueryInput").value=q;
+ const r=resolve(q); showResult(q,r);
+ if(r && !r.error && r.type==="A") document.getElementById("queryStatusBadge").textContent="Resolved";
+ else if(r && r.error) document.getElementById("queryStatusBadge").textContent="NXDOMAIN";
+ else document.getElementById("queryStatusBadge").textContent="Resolved";
+}
+function resetSteps(){
+ step=0; document.querySelectorAll(".step-card").forEach(x=>x.classList.remove("active"));
+ document.getElementById("stepProgressText").textContent="Step 0 of 6";
+ document.getElementById("btnPrevStep").disabled=true;
+ document.getElementById("btnNextStep").disabled=false;
+}
+function nextStep(){
+ if(step<6){step++;document.getElementById("stepCard"+step).classList.add("active")}
+ document.getElementById("stepProgressText").textContent=`Step ${step} of 6`;
+ document.getElementById("btnPrevStep").disabled=step===0;
+ document.getElementById("btnNextStep").disabled=step===6;
+ if(step===6) doQuery(document.getElementById("domainQueryInput").value);
+}
+function prevStep(){if(step>0){document.getElementById("stepCard"+step).classList.remove("active");step--}document.getElementById("stepProgressText").textContent=`Step ${step} of 6`;document.getElementById("btnPrevStep").disabled=step===0;document.getElementById("btnNextStep").disabled=false}
+function terminal(cmd){
+ const out=document.getElementById("terminalOutputArea"), line=document.createElement("div"); line.className="terminal-output";
+ if(cmd.startsWith("nslookup -type=MX")) line.textContent=`> ${cmd}\nServer:  LocalDNS\nAddress: 192.0.2.1\n\nunivcampus.edu\n    mail exchanger = 10 mail.univcampus.edu`;
+ else if(cmd.startsWith("nslookup ")){let q=cmd.slice(9).trim(),r=resolve(q);line.textContent=r.error?`> ${cmd}\nServer: LocalDNS\n*** ${q} can't be found: NXDOMAIN`:`> ${cmd}\nServer: LocalDNS\nAddress: 192.0.2.1\n\nName: ${q}\n${r.type==="CNAME"?"canonical name = "+records[q].value+"\n":""}Address: ${r.value}`;}
+ else if(cmd==="help") line.textContent="help | zoneinfo | cacheinfo | clear | nslookup <hostname>";
+ else if(cmd==="zoneinfo") line.textContent=Object.entries(records).map(([n,r])=>`${n}  ${r.type}  ${r.value}`).join("\n");
+ else if(cmd==="cacheinfo") line.textContent=Object.keys(cache).length+" cached entries";
+ else if(cmd==="clear"){cache={};updateCache();line.textContent="Cache cleared."}
+ else line.textContent="Unknown command. Type help.";
+ out.insertBefore(line,out.querySelector(".terminal-prompt-line"));
+}
+document.addEventListener("DOMContentLoaded",()=>{
+ renderRecords();updateCache();resetSteps();
+ document.getElementById("btnResolveDns").onclick=()=>doQuery(document.getElementById("domainQueryInput").value);
+ document.getElementById("btnResolveQueryTop").onclick=()=>doQuery(document.getElementById("domainQueryInput").value);
+ document.getElementById("btnStepByStep").onclick=()=>{resetSteps();nextStep()};
+ document.getElementById("btnStepByStepTop").onclick=()=>{document.getElementById("secQuerySimulator").scrollIntoView({behavior:"smooth"});resetSteps();nextStep()};
+ document.getElementById("btnNextStep").onclick=nextStep;document.getElementById("btnPrevStep").onclick=prevStep;document.getElementById("btnResetSteps").onclick=resetSteps;
+ document.getElementById("btnAutoPlay").onclick=()=>{resetSteps();let t=setInterval(()=>{nextStep();if(step===6)clearInterval(t)},Number(document.getElementById("speedSelector").value))};
+ document.querySelectorAll(".preset-btn").forEach(b=>b.onclick=()=>doQuery(b.dataset.query));
+ document.querySelectorAll(".term-cmd-btn").forEach(b=>b.onclick=()=>terminal(b.dataset.cmd));
+ document.getElementById("termCliInput").addEventListener("keydown",e=>{if(e.key==="Enter"){terminal(e.target.value);e.target.value=""}});
+ document.getElementById("btnClearCacheBtn").onclick=()=>{cache={};updateCache()};document.getElementById("btnClearCacheTop").onclick=()=>{cache={};updateCache()};
+ document.getElementById("btnResetSimTop").onclick=()=>location.reload();
+ document.getElementById("btnSet50Preset").onclick=()=>document.getElementById("newWebServerIpInput").value="192.0.2.50";
+ document.getElementById("btnUpdateWebServerIp").onclick=()=>{
+  const ip=document.getElementById("newWebServerIpInput").value.trim();
+  if(!/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)){alert("Enter a valid IPv4 address.");return}
+  webIP=ip;records["www.univcampus.edu"].value=ip;
+  document.getElementById("webIpBadgeCurrent").textContent="Current: "+ip;
+  document.getElementById("boxIpAfter").textContent=ip;document.getElementById("svgWwwIpText").textContent=ip;
+  renderRecords();cache={};updateCache();
+ };
+ document.getElementById("btnShowZoneRecords").onclick=()=>document.getElementById("secZoneRecords").scrollIntoView({behavior:"smooth"});
+ document.getElementById("btnRunNslookupTop").onclick=()=>{document.getElementById("secTerminalSimulator").scrollIntoView({behavior:"smooth"});document.getElementById("termCliInput").focus()};
+});
+</script>
+</body>
+</html>
